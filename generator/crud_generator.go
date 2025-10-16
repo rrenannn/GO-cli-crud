@@ -21,6 +21,7 @@ func GenerateCRUD(table, moduleName string) error {
 		"repository": "templates/repository.tmpl",
 		"service":    "templates/service.tmpl",
 		"handler":    "templates/handler.tmpl",
+		"model":      "templates/model.tmpl",
 	}
 
 	for name, path := range files {
@@ -34,10 +35,10 @@ func GenerateCRUD(table, moduleName string) error {
 			return fmt.Errorf("erro ao compilar template %s: %w", path, err)
 		}
 
-		outputDir := fmt.Sprintf("internal/%s", name)
+		outputDir := fmt.Sprintf("internal/%s", table)
 		os.MkdirAll(outputDir, os.ModePerm)
 
-		outputPath := filepath.Join(outputDir, fmt.Sprintf("%s_%s.go"), table, name)
+		outputPath := filepath.Join(outputDir, fmt.Sprintf("%s.go"), name)
 		out, err := os.Create(outputPath)
 		if err != nil {
 			return fmt.Errorf("erro ao criar arquivo %s: %w", outputPath, err)
