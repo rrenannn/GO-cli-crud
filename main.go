@@ -1,1 +1,5 @@
-package GO_cli_crud
+package main
+
+func main() {
+
+}
