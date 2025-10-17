@@ -1,0 +1,33 @@
+package {{.EntityLower}}
+
+import (
+	"context"
+	db "uber-fx/db/sqlc"
+)
+
+type {{.Entity}}Repository interface {
+{{range .Queries}}	{{.Name}}(ctx context.Context{{if .Params}}, {{.Params}}{{end}}) ({{.ReturnType}}, error)
+{{end}}}
+
+type Repository struct {
+	Conn    *sql.DB
+	DBtx    db.DBTX
+	Queries *db.Queries
+	SqlConn *sql.DB
+}
+
+func NewRepository(conn *sql.DB) *Repository {
+	q := db.New(conn)
+	return &Repository{
+		Conn:    conn,
+		DBtx:    conn,
+		Queries: q,
+		SqlConn: conn,
+	}
+}
+
+{{range .Queries}}
+func (r *Repository) {{.Name}}(ctx context.Context{{if .Params}}, {{.Params}}{{end}}) ({{.ReturnType}}, error) {
+	return r.Queries.{{.Name}}(ctx{{if .Args}}, {{.Args}}{{end}})
+}
+{{end}}

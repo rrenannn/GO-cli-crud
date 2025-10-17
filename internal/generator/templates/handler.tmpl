@@ -1,0 +1,64 @@
+package {{.EntityLower}}
+
+import (
+	"net/http"
+	"github.com/labstack/echo/v4"
+)
+
+type {{.Entity}}Handler interface {
+{{range .Queries}}	{{.Name}}(c echo.Context) error
+{{end}}}
+
+type Handler struct {
+	service {{.Entity}}Service
+}
+
+func NewHandler(service {{.Entity}}Service) *Handler {
+	return &Handler{service: service}
+}
+
+{{range .Queries}}
+func (h *Handler) {{.Name}}(c echo.Context) error {
+	{{if eq .Type ":one"}} // query retorna 1 item
+	{{if .HasID}}idParam := c.Param("id")
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	result, err := h.service.{{.Name}}(c.Request().Context(), int32(id))
+	{{else}}
+	var req {{.RequestType}}
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	result, err := h.service.{{.Name}}(c.Request().Context(), req)
+	{{end}}
+	{{else if eq .Type ":many"}} // query retorna slice
+	result, err := h.service.{{.Name}}(c.Request().Context())
+	{{else if eq .Type ":exec"}} // query de execução
+	{{if .HasID}}
+	idParam := c.Param("id")
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	err := h.service.{{.Name}}(c.Request().Context(), int32(id))
+	{{else}}
+	var req {{.RequestType}}
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	err := h.service.{{.Name}}(c.Request().Context(), req)
+	{{end}}
+	{{end}}
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	{{if or (eq .Type ":one") (eq .Type ":many")}}
+	return c.JSON(http.StatusOK, result)
+	{{else}}
+	return c.JSON(http.StatusOK, map[string]string{"status":"ok"})
+	{{end}}
+}
+{{end}}

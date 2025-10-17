@@ -1,0 +1,9 @@
+package {{.EntityLower}}
+
+type {{.Entity}}Request struct {
+{{range .RequestFields}}    {{.Name}} {{.Type}} `json:"{{.JSON}}"`{{end}}
+}
+
+type {{.Entity}}Response struct {
+{{range .ResponseFields}}    {{.Name}} {{.Type}} `json:"{{.JSON}}"`{{end}}
+}

@@ -1,0 +1,24 @@
+package {{.EntityLower}}
+
+import (
+	"context"
+	db "uber-fx/db/sqlc"
+)
+
+type {{.Entity}}Service interface {
+{{range .Queries}}	{{.Name}}(ctx context.Context{{if .Params}}, {{.Params}}{{end}}) ({{.ReturnType}}, error)
+{{end}}}
+
+type Service struct {
+	repo {{.Entity}}Repository
+}
+
+func NewService(repo {{.Entity}}Repository) *Service {
+	return &Service{repo: repo}
+}
+
+{{range .Queries}}
+func (s *Service) {{.Name}}(ctx context.Context{{if .Params}}, {{.Params}}{{end}}) ({{.ReturnType}}, error) {
+	return s.repo.{{.Name}}(ctx{{if .Args}}, {{.Args}}{{end}})
+}
+{{end}}
