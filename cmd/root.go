@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/rrenannn/GO-cli-crud/internal/generator"
+	"github.com/rrenannn/crudgen/internal/generator"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +16,7 @@ var generateCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		entity := args[0]
 		sqlcFile := "db/sqlc/" + entity + ".sql.go"
-		sqlFile := "db/sqlc/" + entity + ".sql"
+		sqlFile := "db/query/" + entity + ".sql"
 		return generator.Generate(entity, sqlcFile, sqlFile)
 	},
 }

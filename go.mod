@@ -1,4 +1,4 @@
-module github.com/rrenannn/GO-cli-crud
+module github.com/rrenannn/crudgen
 
 go 1.25.1
 
